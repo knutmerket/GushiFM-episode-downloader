@@ -12,7 +12,6 @@ from selenium import webdriver
 
 driver = webdriver.Firefox()
 
-#Set exist_ok to False before finishing... Inside a try/except statement that handles the exception that is raised when the folder exists?
 os.makedirs('./GushiFM', exist_ok=True)
 os.chdir('./GushiFM')
 
@@ -41,7 +40,6 @@ for link in episode_list:
     driver.get(link)
     try:
         audio_link_raw = driver.find_element_by_css_selector('audio').get_attribute('src')
-        print('Placeholder 1')
         # Remove part after ".mp3" from link
         audio_link = audio_link_raw.split('?')[0]
         #direct_links.append(audio_link) #MP3-URLs
