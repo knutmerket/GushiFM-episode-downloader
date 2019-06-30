@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Jun 20 18:30:55 2019
 
-@author: knut
+"""
+Script that goes through the episode pages of storyfm.cn, scrapes the .mp3 episode files links and downloads the episodes.
+
+Creates a "GushiFM" folder in the current directory (unless a folder with that name already exists).
+
+Will stop going through episode pages as soon as it reaches a page with an episode number that is already in a filename in the "GushiFM" folder.
+
 """
 
 import os
@@ -50,29 +54,33 @@ while True:
         break
         
 print("\nList with a total of %s links from %d pages created" % (len(episode_list), page_count-1))
+print("The following episodes will be downloaded: " + "\n" + "\n".join(episode_list))
 
 
 #Uncomment below lines marked "MP3-URLs" if you want a list of the direct URLs to the MP3s to be printed at the end
 #direct_links = [] #MP3-URLs
 
-for link in episode_list:
-    driver.get(link)
-    try:
-        audio_link_raw = driver.find_element_by_css_selector('audio').get_attribute('src')
-        # Remove part after ".mp3" from link
-        audio_link = audio_link_raw.split('?')[0]
-        #direct_links.append(audio_link) #MP3-URLs
-        file_name = audio_link.split('/')[-1]
-        res = requests.get(audio_link)
-        res.raise_for_status()
-        save_file = open(file_name, 'wb')
-        for chunk in res.iter_content(100000):
-            save_file.write(chunk)
-    except:
-        print('Problem!')
-        continue
-    
-print('All done!')
+if episode_list:
+    for link in episode_list:
+        driver.get(link)
+        try:
+            audio_link_raw = driver.find_element_by_css_selector('audio').get_attribute('src')
+            # Remove part after ".mp3" from link
+            audio_link = audio_link_raw.split('?')[0]
+            #direct_links.append(audio_link) #MP3-URLs
+            file_name = audio_link.split('/')[-1]
+            res = requests.get(audio_link)
+            res.raise_for_status()
+            save_file = open(file_name, 'wb')
+            for chunk in res.iter_content(100000):
+                save_file.write(chunk)
+        except:           
+            print('Problem!')
+            continue
+    print('All done!')
+else:
+    print("No new episodes to download.")
+
     
 #if len(direct_links) > 0: #MP3-URLs
     #print(direct_links) #MP3-URLs
